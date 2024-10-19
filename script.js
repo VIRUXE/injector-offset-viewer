@@ -2,13 +2,13 @@ const toast = document.getElementById("toast");
 
 let injectorData = {};
 
-fetch('injector-data.json')
+fetch("injector-data.json")
 	.then(response => response.json())
 	.then(data => {
 		injectorData = data;
-		displayInjectors(injectorData);
+		displayInjectors();
 	})
-	.catch(() => displayToast('Failed to load data!'));
+	.catch(error => displayToast(error instanceof SyntaxError ? "Failed to parse data!" : "Failed to load data!"));
 
 function displayToast(message) {
 	toast.textContent = message;
