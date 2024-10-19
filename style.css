@@ -6,6 +6,15 @@ body {
 	color           : #e0e0e0;
 }
 
+a {
+	color     : #e0e0e0;
+	transition: color 0.3s ease;
+}
+
+a:hover, a:visited {
+	color: #CCC;
+}
+
 #toast {
 	position        : fixed;
 	top             : 20px;
@@ -128,7 +137,6 @@ footer {
 
 footer a {
 	font-weight: bold;
-	color      : #e0e0e0;
 }
 
 @media (min-width: 768px) {
