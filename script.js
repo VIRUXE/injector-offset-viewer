@@ -117,7 +117,8 @@ const hints = [
 	"Type in the search bar to filter the injectors.",
 	"Click on a latency value to copy it to the clipboard.",
 	"Search by Brand, Description, Capacity or Impedance.",
-	"Hover over a card to see the latency table. Voltage/ms",
+	"Hover over a card to see the latency table. <i>Voltage</i>/<i>ms</i>",
+	"Want to add more data? Edit <a href=\"https://github.com/VIRUXE/injector-offset-viewer/edit/main/injector-data.json\">injector-data.json</a>, on GitHub.",
 ];
 
 // Replace "Click" and "Hover" with "Tap" and "Touch" on mobile devices
@@ -133,12 +134,10 @@ setInterval(() => {
 	hint.style.opacity = 0;
 
 	setTimeout(() => {
-		hint.textContent   = hints[currentHint];
+		hint.innerHTML   = hints[currentHint];
 		hint.style.opacity = 1;
 		currentHint = (currentHint + 1) % hints.length;
 	}, hint.computedStyleMap().get("transition-duration").value * 1000);
 }, 5000);
 
-hint.textContent = hints[currentHint];
-
-displayInjectors();
+hint.innerHTML = hints[currentHint];
