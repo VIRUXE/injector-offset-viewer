@@ -48,38 +48,53 @@ function displayInjectors(data = injectorData) {
 
 	grid.innerHTML = "";
 
-	for (const [brand, injectors] of Object.entries(data))
+	for (const [brand, injectors] of Object.entries(data)) {
 		injectors.forEach(injector => {
-			const card = createInjectorCard(brand, injector);
+			(injector.variants || [injector]).forEach(injectorData => {
+				if (injector.variants) injectorData.description = injector.description;
+				
+				const card = createInjectorCard(brand, injectorData);
 
-			grid.appendChild(card); // We do this first to get the table height (if it doesn't get rendered, it will be 0)
-			
-			const tableContainer = card.getElementsByTagName("div")[0];
-			const table          = tableContainer.getElementsByTagName("table")[0];
-			const tableHeight    = tableContainer.scrollHeight;
+				grid.appendChild(card);
 
-			card.addEventListener("mouseenter", () => {
-				tableContainer.style.height = `${tableHeight}px`;
-				table.style.opacity = 1;
-			});
+				const tableContainer = card.getElementsByTagName("div")[0];
+				const table          = tableContainer.getElementsByTagName("table")[0];
+				const tableHeight    = tableContainer.scrollHeight;
 
-			card.addEventListener("mouseleave", () => {
-				tableContainer.style.height = "0";
-				table.style.opacity = 0;
+				card.addEventListener("mouseenter", () => {
+					tableContainer.style.height = `${tableHeight}px`;
+					table.style.opacity         = 1;
+				});
+
+				card.addEventListener("mouseleave", () => {
+					tableContainer.style.height = "0";
+					table.style.opacity         = 0;
+				});
 			});
 		});
 }
 
 function filterInjectors(searchTerm) {
 	const filtered = {};
+	const lowerSearchTerm = searchTerm.toLowerCase();
 
 	for (const [brand, injectors] of Object.entries(injectorData)) {
-		const filteredInjectors = injectors.filter(injector =>
-			brand.toLowerCase().includes(searchTerm) ||
-			injector.description.toLowerCase().includes(searchTerm) ||
-			injector.cc.toString().includes(searchTerm) ||
-			injector.ohm.toString().includes(searchTerm)
-		);
+		const filteredInjectors = injectors.filter(injector => {
+			const matches = brand.toLowerCase().includes(lowerSearchTerm) ||
+				(injector.description && injector.description.toLowerCase().includes(lowerSearchTerm)) ||
+				(injector.cc && injector.cc.toString().includes(lowerSearchTerm)) ||
+				(injector.ohm && injector.ohm.toString().includes(lowerSearchTerm));
+
+			if (matches) return true;
+
+			const variants = injector.variants || [];
+
+			return variants.some(variant => 
+				(variant.description && variant.description.toLowerCase().includes(lowerSearchTerm)) ||
+				(variant.cc && variant.cc.toString().includes(lowerSearchTerm)) ||
+				(variant.ohm && variant.ohm.toString().includes(lowerSearchTerm))
+			);
+		});
 
 		if (filteredInjectors.length > 0) filtered[brand] = filteredInjectors;
 	}
