@@ -3,17 +3,17 @@ const toast = document.getElementById("toast");
 let injectorData = {};
 
 fetch("injector-data.json")
-	.then(response => response.json())
-	.then(data => {
-		injectorData = data;
-		displayInjectors();
-	})
-	.catch(error => displayToast(error instanceof SyntaxError ? "Failed to parse data!" : "Failed to load data!"));
+.then(response => response.json())
+.then(data => {
+	injectorData = data;
+	displayInjectors();
+})
+.catch(error => displayToast(error instanceof SyntaxError ? "Failed to parse data!" : "Failed to load data!"));
 
 function displayToast(message) {
 	toast.textContent = message;
-	toast.style.opacity = 1;
-	setTimeout(() => toast.style.opacity = 0, toast.computedStyleMap().get("transition-duration").value * 1000 * 2);
+	toast.animate({ display: "block", opacity: [0, 1] }, { duration: 1000, fill: "forwards", easing: "ease-in-out" }).onfinish = () =>
+		toast.animate({ display: "none", opacity: [1, 0] }, { duration: 1000, fill: "forwards", easing: "ease-in-out" });
 }
 
 function createInjectorCard(brand, injector) {
@@ -143,3 +143,20 @@ setInterval(() => {
 }, 5000);
 
 hint.innerHTML = hints[currentHint];
+
+// Scroll to top button
+const topElement = document.getElementById("top");
+window.onscroll = () => {
+	const hasScrolledEnough = document.body.scrollTop > 20 || document.documentElement.scrollTop > 20;
+
+	if (hasScrolledEnough && topElement.style.display === "flex") return;
+	if (!hasScrolledEnough && topElement.style.display === "none") return;
+
+	topElement.style.display = hasScrolledEnough ? "flex" : "none";
+	topElement.animate({ opacity: hasScrolledEnough ? [0, 1] : [1, 0] }, { duration: 500, fill: "forwards", easing: "ease-in-out" });
+}
+
+topElement.addEventListener("click", () => {
+	document.body.scrollTop            = 0;
+	document.documentElement.scrollTop = 0;
+});
