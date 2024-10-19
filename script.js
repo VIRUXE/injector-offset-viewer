@@ -22,9 +22,9 @@ function createInjectorCard(brand, injector) {
 	card.className = "injector-card";
 	card.innerHTML = `
 		<h3>${brand}</h3>
-		<p><strong>Description:</strong> ${injector.description}</p>
+		${injector.description ? `<p><strong>Description:</strong> ${injector.description}</p>` : ""}
 		<p><strong>Capacity:</strong> <span class="detail"><span>${injector.cc}</span> CC</span></p>
-		<p><strong>Impedance:</strong> <span class="detail"><span>${injector.ohm}</span> Ohm</span></p>
+		${injector.ohm ? `<p><strong>Impedance:</strong> <span class="detail"><span>${injector.ohm}</span> Ohm</span></p>` : ""}
 		<div>
 			<table title="Click to copy the value.">
 				<tr>${injector.voltage.map(v => `<th>${v}</th>`).join("")}</tr>
@@ -72,6 +72,7 @@ function displayInjectors(data = injectorData) {
 				});
 			});
 		});
+	}
 }
 
 function filterInjectors(searchTerm) {
