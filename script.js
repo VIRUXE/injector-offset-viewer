@@ -52,7 +52,7 @@ function displayInjectors(data = injectorData) {
 		injectors.forEach(injector => {
 			(injector.variants || [injector]).forEach(injectorData => {
 				if (injector.variants) injectorData.description = injector.description;
-				
+
 				const card = createInjectorCard(brand, injectorData);
 
 				grid.appendChild(card);
@@ -73,6 +73,8 @@ function displayInjectors(data = injectorData) {
 			});
 		});
 	}
+
+	document.getElementById("count").textContent = Object.values(data).flat().length + " injectors in total.";
 }
 
 function filterInjectors(searchTerm) {
