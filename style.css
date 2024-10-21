@@ -73,6 +73,11 @@ a:hover, a:visited {
 	transition: opacity 500ms ease;
 }
 
+#count {
+	text-align: center;
+	font-size : small;
+}
+
 #injectorGrid {
 	display              : grid;
 	width                : 100%;
