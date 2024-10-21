@@ -23,7 +23,7 @@ function createInjectorCard(brand, injector) {
 	card.innerHTML = `
 		<h3>${brand}</h3>
 		${injector.description ? `<p><strong>Description:</strong> ${injector.description}</p>` : ""}
-		<p><strong>Capacity:</strong> <span class="detail"><span>${injector.cc}</span> CC</span></p>
+		<p title="Double-click to change Flow Unit"><strong>Capacity:</strong> <span class="detail"><span>${injector.cc}</span> CC</span></p>
 		${injector.ohm ? `<p><strong>Impedance:</strong> <span class="detail"><span>${injector.ohm}</span> Ohm</span></p>` : ""}
 		<div>
 			<table title="Click to copy the value.">
