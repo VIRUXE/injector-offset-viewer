@@ -61,6 +61,9 @@ function createInjectorCard(brand, injector) {
 }
 
 function displayInjectors(data = injectorData) {
+	// Sort by brand name
+	data = Object.fromEntries(Object.entries(data).sort((a, b) => a[0].localeCompare(b[0])));
+	
 	const grid = document.getElementById("injectorGrid");
 
 	grid.innerHTML = "";
