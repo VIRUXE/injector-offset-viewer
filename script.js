@@ -23,7 +23,7 @@ function createInjectorCard(brand, injector) {
 	card.innerHTML = `
 		<h3>${brand}</h3>
 		${injector.description ? `<p><strong>Description:</strong> ${injector.description}</p>` : ""}
-		<p title="Double-click to change Flow Unit"><strong>Capacity:</strong> <span class="detail"><span>${injector.cc}</span> CC</span></p>
+		<p title="Double-click to change Flow Unit"><strong>Capacity:</strong> <span class="detail"><span>${injector.cc}</span> CC/min</span></p>
 		${injector.ohm ? `<p><strong>Impedance:</strong> <span class="detail"><span>${injector.ohm}</span> Ohm</span></p>` : ""}
 		<div>
 			<table title="Click to copy the value.">
@@ -32,6 +32,23 @@ function createInjectorCard(brand, injector) {
 			</table>
 		</div>
 	`;
+	
+	// Convert capacity unit on double-click 
+	const getCapacityParagraph = card => Array.from(card.getElementsByTagName("p")).find(p => p.textContent.includes("Capacity"));
+
+	getCapacityParagraph(card).addEventListener("dblclick", () => {
+		const CONVERSION_FACTOR = 0.09583;
+
+		document.querySelectorAll(".injector-card").forEach(card => {
+			const capacitySpan = getCapacityParagraph(card).querySelector("span");
+			const isCC         = capacitySpan.textContent.includes("CC");
+
+			const value    = parseFloat(capacitySpan.textContent);
+			const newValue = isCC ? (value * CONVERSION_FACTOR).toFixed(2) : (value / CONVERSION_FACTOR).toFixed(0);
+
+			capacitySpan.innerHTML = `<span>${newValue}</span> ${isCC ? "LB/hour" : "CC/min"}`;
+		});
+	});
 
 	// Copy cell value to clipboard on click
 	card.querySelectorAll("th, td").forEach(cell => cell.addEventListener("click", e =>

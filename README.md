@@ -15,6 +15,8 @@ Cards are hoverable on a computer and clickable on a mobile device.
 
 Just click on either the _voltage_ or _injection time_ values to copy them to your _clipboard_.
 
+Clicking on the Capacity will convert the values between _cc/min_ and _lb/hr_.
+
 https://viruxe.github.io/injector-offset-viewer
 
 # `injector-data.json`
