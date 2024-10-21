@@ -125,13 +125,15 @@ function filterInjectors(searchTerm) {
 	return filtered;
 }
 
-document.getElementById("searchBar").addEventListener("input", e => {
+const searchBar = document.getElementById("searchBar");
+searchBar.addEventListener("input", e => {
 	const filteredData = filterInjectors(e.target.value.toLowerCase());
 
 	if (Object.entries(filteredData).length === 0) displayToast("No results found!");
 
 	displayInjectors(filteredData);
 });
+searchBar.focus();
 
 const hint = document.getElementById("hint");
 
