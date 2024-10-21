@@ -1,0 +1,39 @@
+name: Update README with Injector Count
+
+on:
+  push:
+    paths:
+      - 'injector-data.json'
+  workflow_dispatch:
+
+jobs:
+  update-readme:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v2
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: '14'
+
+      - name: Calculate Injector Count
+        id: calculate
+        run: |
+          count=$(node -e "const data = require('./injector-data.json'); console.log(Object.values(data).flat().length);")
+          echo "injector_count=$count" >> $GITHUB_ENV
+
+      - name: Update README.md
+        run: |
+          sed -i "s/Total Injectors: \*\*[0-9]*\*\*/Total Injectors: **${{ env.injector_count }}**/" README.md
+
+      - name: Commit changes
+        run: |
+          git config --global user.name 'github-actions'
+          git config --global user.email 'github-actions@github.com'
+          git add README.md
+          git commit -m "Update total injectors count to ${{ env.injector_count }}"
+
+      - name: Push changes
+        run: git push
