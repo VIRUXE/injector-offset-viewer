@@ -121,6 +121,7 @@ const hints = [
 	"Search by Brand, Description, Capacity or Impedance.",
 	"Hover over a card to see the latency table. <i>Voltage</i>/<i>ms</i>",
 	"Want to add more data? Edit <a href=\"https://github.com/VIRUXE/injector-offset-viewer/edit/main/injector-data.json\">injector-data.json</a>, on GitHub.",
+	"If pressure is not listed, it's usually 43.5 PSI (3 BAR).",
 ];
 
 // Replace "Click" and "Hover" with "Tap" and "Touch" on mobile devices
