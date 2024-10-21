@@ -6,17 +6,22 @@ on:
       - 'injector-data.json'
   workflow_dispatch:
 
+permissions:
+  contents: write
+
 jobs:
   update-readme:
     runs-on: ubuntu-latest
     steps:
       - name: Check out repository
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Set up Node.js
-        uses: actions/setup-node@v2
+        uses: actions/setup-node@v3
         with:
-          node-version: '14'
+          node-version: '20'  # Changed from '14' to '20'
 
       - name: Calculate Injector Count
         id: calculate
@@ -30,10 +35,11 @@ jobs:
 
       - name: Commit changes
         run: |
-          git config --global user.name 'github-actions'
-          git config --global user.email 'github-actions@github.com'
+          git config --global user.name 'github-actions[bot]'
+          git config --global user.email 'github-actions[bot]@users.noreply.github.com'
           git add README.md
           git commit -m "Update total injectors count to ${{ env.injector_count }}"
 
       - name: Push changes
-        run: git push
+        run: |
+          git push origin HEAD:${GITHUB_REF}
