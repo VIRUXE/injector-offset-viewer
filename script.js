@@ -71,7 +71,7 @@ function displayInjectors(data = injectorData) {
 	for (const [brand, injectors] of Object.entries(data)) {
 		injectors.forEach(injector => {
 			(injector.variants || [injector]).forEach(injectorData => {
-				if (injector.variants) injectorData.description = injector.description;
+				if (injector.variants) injectorData.description = '(Variant) ' + injector.description;
 
 				const card = createInjectorCard(brand, injectorData);
 
