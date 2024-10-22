@@ -183,3 +183,22 @@ topElement.addEventListener("click", () => {
 	document.body.scrollTop            = 0;
 	document.documentElement.scrollTop = 0;
 });
+
+// Interactions for PayPal donation callbacks
+const urlParams = new URLSearchParams(window.location.search);
+if (urlParams.has('thanks')) { 
+	displayToast("Thank you for your support!");
+
+	const thankYouMessage = document.createElement("p");
+
+	with (thankYouMessage) {
+		textContent     = "THANK YOU FOR YOUR SUPPORT!";
+		style.fontSize  = "larger";
+		style.textAlign = "center";
+		style.margin    = "2em 0";
+	}
+
+	document.body.insertBefore(thankYouMessage, document.body.firstChild);
+} else if (urlParams.has('cancelledDonation')) {
+	displayToast("Donation Cancelled!");
+}
