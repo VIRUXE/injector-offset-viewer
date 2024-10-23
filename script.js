@@ -68,8 +68,7 @@ function createInjectorCard(brand, injector) {
 }
 
 function displayInjectors(data = injectorData) {
-	// Sort by brand name
-	data = Object.fromEntries(Object.entries(data).sort((a, b) => a[0].localeCompare(b[0])));
+	data = Object.fromEntries(Object.entries(data).sort((a, b) => a[0].localeCompare(b[0]))); // Sort by brand name
 	
 	const grid = document.getElementById("injectorGrid");
 
@@ -168,7 +167,6 @@ document.addEventListener("keypress", e => {
 		}
 	}
 });
-searchBar.focus();
 
 const hint = document.getElementById("hint");
 
