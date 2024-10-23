@@ -8,9 +8,8 @@ fetch("injector-data.json")
 	injectorData = data;
 	
 	// Get search term from local storage
-	const searchTerm = localStorage?.getItem("searchTerm") || "";
-	if (searchTerm) searchBar.value = searchTerm;
-
+	const searchTerm = typeof localStorage !== "undefined" ? localStorage.getItem("searchTerm") || "" : "";
+	searchBar.value = searchTerm;
 	searchInjectors(searchTerm);
 	
 	searchBar.focus();
