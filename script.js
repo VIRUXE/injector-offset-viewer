@@ -18,7 +18,6 @@ function displayToast(message) {
 
 function createInjectorCard(brand, injector) {
 	const card = document.createElement("div");
-
 	card.className = "injector-card";
 	card.innerHTML = `
 		<h3>${brand}</h3>
@@ -26,9 +25,8 @@ function createInjectorCard(brand, injector) {
 		<p title="Double-click to change Flow Unit"><strong>Capacity:</strong> <span class="detail"><span>${injector.cc}</span> CC/min</span></p>
 		${injector.ohm ? `<p><strong>Impedance:</strong> <span class="detail"><span>${injector.ohm}</span> Ohm</span></p>` : ""}
 		<div>
-			<table title="Click to copy the value.">
-				<tr>${injector.voltage.map(v => `<th>${v}</th>`).join("")}</tr>
-				<tr>${injector.latency.map(l => `<td>${l}</td>`).join("")}</tr>
+				<tr>${Object.keys(injector.offsets).map(v => `<th>${v}</th>`).join("")}</tr>
+				<tr>${Object.values(injector.offsets).map(l => `<td>${l}</td>`).join("")}</tr>
 			</table>
 		</div>
 	`;
