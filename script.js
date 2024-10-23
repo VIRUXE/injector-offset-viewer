@@ -6,7 +6,15 @@ fetch("injector-data.json")
 .then(response => response.json())
 .then(data => {
 	injectorData = data;
-	displayInjectors();
+	
+	// Get search term from local storage
+	const searchTerm = localStorage.getItem("searchTerm");
+	if (searchTerm) searchBar.value = searchTerm;
+
+	searchInjectors(searchTerm);
+	
+	searchBar.focus();
+	searchBar.setSelectionRange(0, searchBar.value.length);
 })
 .catch(error => displayToast(error instanceof SyntaxError ? "Failed to parse data!" : "Failed to load data!"));
 
@@ -97,24 +105,30 @@ function displayInjectors(data = injectorData) {
 }
 
 function filterInjectors(searchTerm) {
-	const filtered = {};
-	const lowerSearchTerm = searchTerm.toLowerCase();
+	if (searchTerm.startsWith(" ")) return injectorData;
 
+	const filtered = {};
+
+	const terms = searchTerm.split(" ");
 	for (const [brand, injectors] of Object.entries(injectorData)) {
 		const filteredInjectors = injectors.filter(injector => {
-			const matches = brand.toLowerCase().includes(lowerSearchTerm) ||
-				(injector.description && injector.description.toLowerCase().includes(lowerSearchTerm)) ||
-				(injector.cc && injector.cc.toString().includes(lowerSearchTerm)) ||
-				(injector.ohm && injector.ohm.toString().includes(lowerSearchTerm));
+			const matches = terms.every(term => 
+				brand.toLowerCase().includes(term) ||
+				(injector.description && injector.description.toLowerCase().includes(term)) ||
+				(injector.cc && injector.cc.toString().includes(term)) ||
+				(injector.ohm && injector.ohm.toString().includes(term))
+			);
 
 			if (matches) return true;
 
 			const variants = injector.variants || [];
 
 			return variants.some(variant => 
-				(variant.description && variant.description.toLowerCase().includes(lowerSearchTerm)) ||
-				(variant.cc && variant.cc.toString().includes(lowerSearchTerm)) ||
-				(variant.ohm && variant.ohm.toString().includes(lowerSearchTerm))
+				terms.every(term => 
+					(variant.description && variant.description.toLowerCase().includes(term)) ||
+					(variant.cc && variant.cc.toString().includes(term)) ||
+					(variant.ohm && variant.ohm.toString().includes(term))
+				)
 			);
 		});
 
@@ -124,13 +138,35 @@ function filterInjectors(searchTerm) {
 	return filtered;
 }
 
-const searchBar = document.getElementById("searchBar");
-searchBar.addEventListener("input", e => {
-	const filteredData = filterInjectors(e.target.value.toLowerCase());
+function searchInjectors(searchTerm = "") { // Empty string to reset search
+	const filteredData = filterInjectors(searchTerm.toLowerCase());
 
 	if (Object.entries(filteredData).length === 0) displayToast("No results found!");
 
 	displayInjectors(filteredData);
+}
+
+const searchBar = document.getElementById("searchBar");
+searchBar.addEventListener("input", e => {
+	const text = e.target.value;
+
+	searchInjectors(text);
+
+	localStorage.setItem("searchTerm", text);
+});
+searchBar.addEventListener("keydown", e => {
+	// Only allow alphanumeric characters, backspace, space, and enter
+	if (!/^[a-z0-9\s\b\n]+$/i.test(e.key)) e.preventDefault();
+});
+document.addEventListener("keypress", e => {
+	if (e.key === "Enter") {
+		if (document.activeElement === searchBar) // Unfocus the search bar
+			e.target.blur();
+		else {// Focus the search bar
+			searchBar.focus();
+			searchBar.setSelectionRange(0, searchBar.value.length);
+		}
+	}
 });
 searchBar.focus();
 
