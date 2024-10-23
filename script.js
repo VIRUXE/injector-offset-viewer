@@ -8,7 +8,7 @@ fetch("injector-data.json")
 	injectorData = data;
 	
 	// Get search term from local storage
-	const searchTerm = localStorage.getItem("searchTerm");
+	const searchTerm = localStorage?.getItem("searchTerm");
 	if (searchTerm) searchBar.value = searchTerm;
 
 	searchInjectors(searchTerm);
