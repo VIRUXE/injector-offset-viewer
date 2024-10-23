@@ -12,7 +12,7 @@ fetch("injector-data.json")
 	searchBar.value = searchTerm;
 	searchInjectors(searchTerm);
 	
-	searchBar.focus();
+	if (!window.location.port) searchBar.focus(); // Annoying with live preview
 	searchBar.setSelectionRange(0, searchBar.value.length);
 })
 .catch(error => displayToast(error instanceof SyntaxError ? "Failed to parse data!" : "Failed to load data!"));
