@@ -174,11 +174,16 @@ const hint = document.getElementById("hint");
 
 const hints = [
 	"Type in the search bar to filter the injectors.",
-	"Click on a latency value to copy it to the clipboard.",
-	"Search by Brand, Description, Capacity or Impedance.",
-	"Hover over a card to see the latency table. <i>Voltage</i>/<i>ms</i>",
+	"Click on either voltage or latency to copy the value.",
+	"Search by Brand, Description, Capacity, Impedance or a combination of them.",
+	"Hover over a card to see the offsets table. <i>Voltage</i>/<i>ms</i>",
 	"Want to add more data? Edit <a href=\"https://github.com/VIRUXE/injector-offset-viewer/edit/main/injector-data.json\">injector-data.json</a>, on GitHub.",
-	"If pressure is not listed, it's usually 43.5 PSI (3 BAR).",
+	"If pressure is not listed, it's usually 43.5 PSI (3 BAR) by default.",
+	"Double-click the capacity to convert between CC/min and LB/hour.",
+	"Click the top button to scroll back to the top.",
+	"Support the project by donating through PayPal, at the bottom of the page.",
+	"Have a suggestion or found a bug? Open an issue on GitHub.",
+	"Press Enter to enter the search bar. If on mobile tap the search button on your keyboard to hide your keyboard.",
 ];
 
 let currentHint = Math.floor(Math.random() * hints.length);
