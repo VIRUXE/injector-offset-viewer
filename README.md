@@ -17,7 +17,7 @@ Just click on either the _voltage_ or _injection time_ values to copy them to yo
 
 Clicking on the Capacity will convert the values between _cc/min_ and _lb/hr_.
 
-https://viruxe.github.io/injector-offset-viewer
+https://injector-offsets.info
 
 # `injector-data.json`
 
@@ -27,4 +27,12 @@ It is used, for example, for https://github.com/VIRUXE/honda-rom-editor to provi
 
 # Contribute
 
+## More data
+
 Feel free to add more injector data by editing [`injector-data.json`](https://github.com/VIRUXE/injector-offset-viewer/edit/main/injector-data.json)
+
+## Donate
+
+If you find this website helpful, please consider donating for the domain costs. 4USD for this first year.
+
+[![Donate Button](https://www.paypalobjects.com/en_GB/i/btn/btn_donate_LG.gif)](https://www.paypal.com/donate?campaign_id=MQGC58FBTZGQC)
