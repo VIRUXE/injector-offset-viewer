@@ -1,13 +1,29 @@
+:root {
+	--background-color                 : #121212;
+	--text-color                       : #e0e0e0;
+	--button-background-color          : #333;
+	--button-border-color              : #444;
+	--hint-color                       : #888;
+	--injector-card-border-color       : #292929;
+	--injector-card-background-color   : #1e1e1e;
+	--injector-card-hover-border-color : #444;
+	--injector-card-hover-shadow-color : rgba(0, 0, 0, 0.2);
+	--injector-card-detail-border-color: #444;
+	--table-border-color               : #444;
+	--table-odd-row-background-color   : #333;
+	--gold                             : #FFD700;
+}
+
 body {
 	font-family     : Roboto, "Segoe UI", Arial, sans-serif;
 	margin          : 0;
 	padding         : 20px;
-	background-color: #121212;
-	color           : #e0e0e0;
+	background-color: var(--background-color);
+	color           : var(--text-color);
 }
 
 a {
-	color     : #e0e0e0;
+	color     : var(--text-color);
 	transition: color 0.3s ease;
 }
 
@@ -42,8 +58,8 @@ a:hover, a:visited {
 	position        : fixed;
 	bottom          : 20px;
 	right           : 20px;
-	background-color: #333;
-	border          : 1px solid #444;
+	background-color: var(--button-background-color);
+	border          : 1px solid var(--button-border-color);
 	border-radius   : 50%;
 	cursor          : pointer;
 	box-shadow      : 0 2px 5px rgba(0, 0, 0, 0.1);
@@ -60,16 +76,16 @@ a:hover, a:visited {
 	padding         : 10px;
 	font-size       : 16px;
 	margin-bottom   : 20px;
-	border          : 1px solid #444;
+	border          : 1px solid var(--button-border-color);
 	border-radius   : 4px;
-	background-color: #333;
-	color           : #e0e0e0;
+	background-color: var(--button-background-color);
+	color           : var(--text-color);
 }
 
 #hint {
 	text-align: center;
 	font-size : small;
-	color     : #888;
+	color     : var(--hint-color);
 	transition: opacity 500ms ease;
 }
 
@@ -88,41 +104,46 @@ a:hover, a:visited {
 }
 
 .injector-card {
-	border          : 1px solid #292929;
+	border          : 1px solid var(--injector-card-border-color);
 	font-size       : smaller;
-	background-color: #1e1e1e;
+	background-color: var(--injector-card-background-color);
 	border-radius   : 8px;
 	padding         : 15px;
 	box-shadow      : 0 2px 5px rgba(0, 0, 0, 0.1);
 	transition      : all 0.3s ease;
 	overflow        : hidden;
-	color           : #e0e0e0;
+	color           : var(--text-color);
 }
 
 .injector-card:hover {
-	border: 1px solid #444;
-	box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+	border    : 1px solid var(--injector-card-hover-border-color);
+	box-shadow: 0 5px 15px var(--injector-card-hover-shadow-color);
+}
+
+.injector-card:hover h3 {
+	color: var(--gold);
 }
 
 .injector-card h3 {
 	margin-top: 0;
-	color     : #e0e0e0;
+	color     : var(--text-color);
+	transition: color 0.3s ease;
 }
 
 .injector-card p {
 	margin: 5px 0;
-	color : #888;
+	color : var(--hint-color);
 }
 
 .injector-card .detail {
-	border       : 1px dashed #444;
+	border       : 1px dashed var(--injector-card-detail-border-color);
 	border-radius: 5px;
 	padding      : 0 3px;
 }
 
 .injector-card .detail span {
 	font-weight: 500;
-	color      : #e0e0e0;
+	color      : var(--text-color);
 }
 
 .injector-card div {
@@ -140,15 +161,16 @@ a:hover, a:visited {
 table {
 	border-collapse : collapse;
 	text-align      : center;
-	border          : 1px solid #444;
+	border          : 1px solid var(--table-border-color);
 	width           : 100%;
 	transition      : opacity 500ms ease-in-out;
-	background-color: #1e1e1e;
-	color           : #e0e0e0;
+	background-color: var(--injector-card-background-color);
+	color           : var(--text-color);
 }
 
 table td, table th {
-	border: 1px solid #444;
+	border    : 1px solid var(--table-border-color);
+	transition: all 500ms ease;
 }
 
 table:hover {
@@ -156,7 +178,12 @@ table:hover {
 }
 
 table tr:nth-child(odd) {
-	background-color: #333;
+	background-color: var(--table-odd-row-background-color);
+}
+
+table td:hover {
+	color           : var(--gold);
+	background-color: #1a1a1a;
 }
 
 footer {
@@ -165,7 +192,12 @@ footer {
 }
 
 footer a {
-	font-weight: bold;
+	text-decoration: none;
+	font-weight    : 600;
+}
+
+footer a:hover {
+	color: var(--gold);
 }
 
 @media (min-width: 768px) {
