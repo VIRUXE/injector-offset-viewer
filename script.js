@@ -235,9 +235,8 @@ if (urlParams.has('thanks')) {
 }
 
 // Mobile stuff
-if (/Android|webOS|iPhone|iPad|iPod|IEMobile|Opera Mini|SamsungTV/i.test(navigator.userAgent)) {
-	hints[1] = hints[1].replace("Click", "Tap");
-	hints[3] = hints[3].replace("Hover", "Touch");
+if (/Android|webOS|iPhone|iPad|iPod|IEMobile|Opera Mini/i.test(navigator.userAgent)) {
+	hints.forEach((hint, index) => hints[index] = hint.replace(/Click|Hover/g, "Tap"));
 
 	// Replace the iframe for the donation campaign with a simple linked button
 	// * This iframe is too big for mobile devices
