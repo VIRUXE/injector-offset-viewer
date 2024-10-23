@@ -146,12 +146,6 @@ const hints = [
 	"If pressure is not listed, it's usually 43.5 PSI (3 BAR).",
 ];
 
-// Replace "Click" and "Hover" with "Tap" and "Touch" on mobile devices
-if (/Android|webOS|iPhone|iPad|iPod|IEMobile|Opera Mini|SamsungTV/i.test(navigator.userAgent)) {
-	hints[1] = hints[1].replace("Click", "Tap");
-	hints[3] = hints[3].replace("Hover", "Touch");
-}
-
 let currentHint = Math.floor(Math.random() * hints.length);
 
 // Change hint every 5 seconds
@@ -201,4 +195,18 @@ if (urlParams.has('thanks')) {
 	document.body.insertBefore(thankYouMessage, document.body.firstChild);
 } else if (urlParams.has('cancelledDonation')) {
 	displayToast("Donation Cancelled!");
+}
+
+// Mobile stuff
+if (/Android|webOS|iPhone|iPad|iPod|IEMobile|Opera Mini|SamsungTV/i.test(navigator.userAgent)) {
+	hints[1] = hints[1].replace("Click", "Tap");
+	hints[3] = hints[3].replace("Hover", "Touch");
+
+	// Replace the iframe for the donation campaign with a simple linked button
+	// * This iframe is too big for mobile devices
+	document.querySelector("footer iframe").outerHTML = `
+		<a href="https://www.paypal.com/donate?campaign_id=MQGC58FBTZGQC" target="_blank">
+			<img src="https://www.paypalobjects.com/en_GB/i/btn/btn_donate_LG.gif" alt="Donate with PayPal" />
+		</a>
+	`;
 }
