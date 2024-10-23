@@ -159,6 +159,7 @@ a:hover, a:visited {
 
 /* Only exists inside cards */
 table {
+	margin-top      : 10px;
 	border-collapse : collapse;
 	text-align      : center;
 	border          : 1px solid var(--table-border-color);
