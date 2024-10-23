@@ -250,3 +250,12 @@ if (/Android|webOS|iPhone|iPad|iPod|IEMobile|Opera Mini|SamsungTV/i.test(navigat
 		</a>
 	`;
 }
+
+// Retrieve last update date from GitHub API
+fetch("https://api.github.com/repos/VIRUXE/injector-offset-viewer/commits")
+.then(response => response.json())
+.then(data => {
+	const lastUpdate = new Date(data[0].commit.author.date);
+	document.getElementsByTagName("footer")[0].insertAdjacentHTML("afterbegin", `<p>Last updated: ${lastUpdate.toLocaleString()}</p>`);
+})
+.catch(error => console.error("Failed to retrieve last update date!", error));
