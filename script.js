@@ -45,7 +45,7 @@ function createInjectorCard(brand, injector, isDuplicate, groupDescription) {
 				<tr>${Object.keys(injector.offsets).map(v => `<th>${v}</th>`).join("")}</tr>
 				<tr>${Object.values(injector.offsets).map(l => `<td>${l}</td>`).join("")}</tr>
 			</table>
-			<span><a href="https://github.com/VIRUXE/injector-offset-viewer/issues/new?assignees=VIRUXE&labels=injector-data,website-submitted&projects=&template=wrong-offsets.md&title=Wrong+Offsets+for+${issueDescription}" target="_blank">Are these offsets wrong?</a></span>
+			<span class="detail"><a href="https://github.com/VIRUXE/injector-offset-viewer/issues/new?assignees=VIRUXE&labels=injector-data,website-submitted&projects=&template=wrong-offsets.md&title=Wrong+Offsets+for+${issueDescription}" target="_blank" title="Submit an Issue on GitHub">Are these offsets wrong?</a></span>
 		</div>
 	`;
 	

@@ -153,6 +153,13 @@ a:hover, a:visited {
 	transition      : height 0.5s ease;
 }
 
+.injector-card .table-container .detail a {
+	color: var(--injector-card-detail-border-color);
+	text-decoration: none;
+}
+
+.injector-card .table-container .detail a:hover {
+	color: var(--gold);
 }
 
 /* Only exists inside cards */
