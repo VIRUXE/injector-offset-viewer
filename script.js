@@ -34,7 +34,7 @@ function createInjectorCard(brand, injector) {
 		${injector.description ? `<p><strong>Description:</strong> ${injector.description}</p>` : ""}
 		<p title="Double-click to change Flow Unit"><strong>Capacity:</strong> <span class="detail"><span>${injector.cc}</span> CC/min</span></p>
 		${injector.ohm ? `<p><strong>Impedance:</strong> <span class="detail"><span>${injector.ohm}</span> Ω</span></p>` : ""}
-		<div>
+		<div class="table-container">
 			<table title="Click to copy the value." cellpadding="3px">
 				<tr>${Object.keys(injector.offsets).map(v => `<th>${v}</th>`).join("")}</tr>
 				<tr>${Object.values(injector.offsets).map(l => `<td>${l}</td>`).join("")}</tr>
@@ -85,7 +85,7 @@ function displayInjectors(data = injectorData) {
 
 				grid.appendChild(card);
 
-				const tableContainer = card.getElementsByTagName("div")[0];
+				const tableContainer = card.getElementsByClassName("table-container")[0];
 				const table          = tableContainer.getElementsByTagName("table")[0];
 				const tableHeight    = tableContainer.scrollHeight;
 
