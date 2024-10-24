@@ -36,6 +36,7 @@ function createInjectorCard(brand, injector, isDuplicate, groupDescription) {
 	card.className = "injector-card";
 	card.innerHTML = `
 		<h3>${brand}</h3>
+		${groupDescription ? `<p><strong>Group:</strong> ${groupDescription}</p>` : ""}
 		${injector.description ? `<p><strong>Description:</strong> ${injector.description}</p>` : ""}
 		<p title="Double-click to change Flow Unit"><strong>Capacity:</strong> <span class="detail"><span>${injector.cc}</span> CC/min</span>${injector.pressure ? ` at <span class="detail"><span>${injector.pressure}</span> PSI</span>` : ""}</p>
 		${injector.ohm ? `<p><strong>Impedance:</strong> <span class="detail"><span>${injector.ohm}</span> Ω</span></p>` : ""}
