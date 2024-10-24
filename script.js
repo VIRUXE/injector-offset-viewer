@@ -27,10 +27,11 @@ function displayToast(message) {
 		toast.animate({ display: "none", opacity: [1, 0] }, { duration: 1000, fill: "forwards", easing: "ease-in-out" });
 }
 
-function createInjectorCard(brand, injector) {
-	// Sort offsets
-	injector.offsets = Object.fromEntries(Object.entries(injector.offsets).sort((a, b) => a[0].localeCompare(b[0])));
-	
+function createInjectorCard(brand, injector, isDuplicate, groupDescription) {
+	injector.offsets = Object.fromEntries(Object.entries(injector.offsets).sort((a, b) => a[0].localeCompare(b[0]))); // Sort offsets
+
+	const issueDescription = `${brand} ${injector.cc}CC ${injector.ohm}Ω ${groupDescription ? `(${groupDescription})` : ""}`.replace(/\s+/g, " ").trim();
+
 	const card = document.createElement("div");
 	card.className = "injector-card";
 	card.innerHTML = `
@@ -43,6 +44,7 @@ function createInjectorCard(brand, injector) {
 				<tr>${Object.keys(injector.offsets).map(v => `<th>${v}</th>`).join("")}</tr>
 				<tr>${Object.values(injector.offsets).map(l => `<td>${l}</td>`).join("")}</tr>
 			</table>
+			<span><a href="https://github.com/VIRUXE/injector-offset-viewer/issues/new?assignees=VIRUXE&labels=injector-data,website-submitted&projects=&template=wrong-offsets.md&title=Wrong+Offsets+for+${issueDescription}" target="_blank">Are these offsets wrong?</a></span>
 		</div>
 	`;
 	
