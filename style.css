@@ -153,13 +153,11 @@ a:hover, a:visited {
 	transition      : height 0.5s ease;
 }
 
-.injector-card > p:nth-child(3) > span {
-	cursor: help;
 }
 
 /* Only exists inside cards */
 table {
-	margin-top      : 10px;
+	margin          : 10px 0;
 	border-collapse : collapse;
 	text-align      : center;
 	border          : 1px solid var(--table-border-color);
