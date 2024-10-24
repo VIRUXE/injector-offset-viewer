@@ -15,7 +15,11 @@ fetch("injector-data.json")
 	if (!window.location.port) searchBar.focus(); // Annoying with live preview
 	searchBar.setSelectionRange(0, searchBar.value.length);
 })
-.catch(error => displayToast(error instanceof SyntaxError ? "Failed to parse data!" : "Failed to load data!"));
+.catch(error => {
+	const message = error instanceof SyntaxError ? "Failed to parse data!" : "Failed to load data!";
+	displayToast(message);
+	console.error(message, error);
+});
 
 function displayToast(message) {
 	toast.textContent = message;
