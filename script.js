@@ -35,7 +35,7 @@ function createInjectorCard(brand, injector, isDuplicate, groupDescription) {
 	const card = document.createElement("div");
 	card.className = "injector-card";
 	card.innerHTML = `
-		<h3>${brand}</h3>
+		<h3>${brand}${isDuplicate ? ' <span class="warning-triangle" title="There are other injector-cards with the same Capacity and Impendance.">⚠️</span>' : ""}</h3>
 		${groupDescription ? `<p><strong>Group:</strong> ${groupDescription}</p>` : ""}
 		${injector.description ? `<p><strong>Description:</strong> ${injector.description}</p>` : ""}
 		<p title="Double-click to change Flow Unit"><strong>Capacity:</strong> <span class="detail"><span>${injector.cc}</span> CC/min</span>${injector.pressure ? ` at <span class="detail"><span>${injector.pressure}</span> PSI</span>` : ""}</p>
@@ -83,12 +83,21 @@ function displayInjectors(data = injectorData) {
 
 	grid.innerHTML = "";
 
-	for (const [brand, injectors] of Object.entries(data)) {
-		injectors.forEach(injector => {
-			(injector.variants || [injector]).forEach(injectorData => {
-				if (injector.variants) injectorData.description = '(Variant) ' + injector.description;
+	for (const [brand, node] of Object.entries(data)) {
+		node.sort((a, b) => a.cc - b.cc); // Sort by CC
+		node.forEach(node => {
+			const isGroup   = node.injectors !== undefined;       // It's a group if "node" contains "injectors"
+			const injectors = isGroup ? node.injectors : [node];  // If it's a group, use the injectors inside it
+			
+			injectors.sort((a, b) => a.cc - b.cc); // Sort by CC
+			injectors.forEach(injector => {
+				const isDuplicate = injectors.some(i => 
+					i     !== injector &&
+					i.cc  === injector.cc &&
+					i.ohm === injector.ohm
+				);
 
-				const card = createInjectorCard(brand, injectorData);
+				const card = createInjectorCard(brand, injector, isDuplicate, isGroup ? node.description : null);
 
 				grid.appendChild(card);
 
@@ -102,7 +111,7 @@ function displayInjectors(data = injectorData) {
 				});
 
 				card.addEventListener("mouseleave", () => {
-					tableContainer.style.height = "0";
+					tableContainer.style.height = 0;
 					table.style.opacity         = 0;
 				});
 			});
@@ -129,13 +138,13 @@ function filterInjectors(searchTerm) {
 
 			if (matches) return true;
 
-			const variants = injector.variants || [];
+			const injectors = injector.injectors || [];
 
-			return variants.some(variant => 
+			return injectors.some(injector => 
 				terms.every(term => 
-					(variant.description && variant.description.toLowerCase().includes(term)) ||
-					(variant.cc && variant.cc.toString().includes(term)) ||
-					(variant.ohm && variant.ohm.toString().includes(term))
+					(injector.description && injector.description.toLowerCase().includes(term)) ||
+					(injector.cc && injector.cc.toString().includes(term)) ||
+					(injector.ohm && injector.ohm.toString().includes(term))
 				)
 			);
 		});
