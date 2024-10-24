@@ -24,13 +24,16 @@ function displayToast(message) {
 }
 
 function createInjectorCard(brand, injector) {
+	// Sort offsets
+	injector.offsets = Object.fromEntries(Object.entries(injector.offsets).sort((a, b) => a[0].localeCompare(b[0])));
+	
 	const card = document.createElement("div");
 	card.className = "injector-card";
 	card.innerHTML = `
 		<h3>${brand}</h3>
 		${injector.description ? `<p><strong>Description:</strong> ${injector.description}</p>` : ""}
 		<p title="Double-click to change Flow Unit"><strong>Capacity:</strong> <span class="detail"><span>${injector.cc}</span> CC/min</span></p>
-		${injector.ohm ? `<p><strong>Impedance:</strong> <span class="detail"><span>${injector.ohm}</span> Ohm</span></p>` : ""}
+		${injector.ohm ? `<p><strong>Impedance:</strong> <span class="detail"><span>${injector.ohm}</span> Ω</span></p>` : ""}
 		<div>
 			<table title="Click to copy the value." cellpadding="3px">
 				<tr>${Object.keys(injector.offsets).map(v => `<th>${v}</th>`).join("")}</tr>
