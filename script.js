@@ -122,7 +122,7 @@ function displayInjectors(data = injectorData) {
 	document.getElementById("count").textContent = Object.values(data).reduce((count, node) => {
 		count += node.length;
 		node.forEach(subNode => {
-			if (subNode.injectors?.some(i => !i.pressure))
+			if (subNode.injectors?.some(i => !i.pressure)) // Doesn't contain entries with pressure prop so it's a group of individual injectors
 				count += subNode.injectors.length - 1; // Minus one because it's a group - we're not counting the group itself
 		});
 		return count;
