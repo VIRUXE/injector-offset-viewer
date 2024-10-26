@@ -137,27 +137,23 @@ function filterInjectors(searchTerm) {
 	const terms = searchTerm.split(" ");
 	for (const [brand, injectors] of Object.entries(injectorData)) {
 		const filteredInjectors = injectors.filter(injector => {
-			const matches = terms.every(term => 
+			if (terms.every(term => 
 				brand.toLowerCase().includes(term) ||
-				(injector.description && injector.description.toLowerCase().includes(term)) ||
-				(injector.cc && injector.cc.toString().includes(term)) ||
-				(injector.ohm && injector.ohm.toString().includes(term))
-			);
-
-			if (matches) return true;
-
-			const injectors = injector.injectors || [];
-
-			return injectors.some(injector => 
+				(injector.description?.toLowerCase().includes(term) ?? false) ||
+				(injector.cc?.toString().includes(term) ?? false) ||
+				(injector.ohm?.toString().includes(term) ?? false)
+			)) return true
+	
+			return (injector.injectors || []).some(nestedInjector => 
 				terms.every(term => 
-					(injector.description && injector.description.toLowerCase().includes(term)) ||
-					(injector.cc && injector.cc.toString().includes(term)) ||
-					(injector.ohm && injector.ohm.toString().includes(term))
+					(nestedInjector.description?.toLowerCase().includes(term) ?? false) ||
+					(nestedInjector.cc?.toString().includes(term) ?? false) ||
+					(nestedInjector.ohm?.toString().includes(term) ?? false)
 				)
-			);
-		});
-
-		if (filteredInjectors.length > 0) filtered[brand] = filteredInjectors;
+			)
+		})
+	
+		if (filteredInjectors.length > 0) filtered[brand] = filteredInjectors
 	}
 
 	return filtered;
