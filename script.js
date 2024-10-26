@@ -118,7 +118,15 @@ function displayInjectors(data = injectorData) {
 		});
 	}
 
-	document.getElementById("count").textContent = Object.values(data).flat().length + " injectors in total.";
+	// Here's some bleach for your eyes
+	document.getElementById("count").textContent = Object.values(data).reduce((count, node) => {
+		count += node.length;
+		node.forEach(subNode => {
+			if (subNode.injectors?.some(i => !i.pressure))
+				count += subNode.injectors.length - 1; // Minus one because it's a group - we're not counting the group itself
+		});
+		return count;
+	}, 0) + " injectors in total.";
 }
 
 function filterInjectors(searchTerm) {
@@ -270,7 +278,7 @@ if (/Android|webOS|iPhone|iPad|iPod|IEMobile|Opera Mini/i.test(navigator.userAge
 fetch("https://api.github.com/repos/VIRUXE/injector-offset-viewer/commits")
 .then(response => response.json())
 .then(data => {
-	const lastUpdate = new Date(data[0].commit.author.date);
-	document.getElementsByTagName("footer")[0].insertAdjacentHTML("afterbegin", `<p>Last updated: ${lastUpdate.toLocaleString()}</p>`);
+	// Index 1 because the first commit will be from github-actions
+	document.getElementsByTagName("footer")[0].insertAdjacentHTML("afterbegin", `<p title="Latest commit: '${data[1].commit.message}'">Last updated: ${new Date(data[0].commit.author.date).toLocaleString()}</p>`);
 })
 .catch(error => console.error("Failed to retrieve last update date!", error));
