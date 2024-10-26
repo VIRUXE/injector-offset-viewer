@@ -1,7 +1,7 @@
 # Injector Offset Viewer
 
 ![Website Preview](https://github.com/user-attachments/assets/8fe10b45-f620-494e-b4a7-530fd68f3f0b)
-<sub>Total Injectors: **84**</sub>
+<sub>Total Injectors: **120**</sub>
 
 A website where you can easily look up battery offset data for common automotive injectors.
 
