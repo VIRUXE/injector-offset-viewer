@@ -28,7 +28,7 @@ function displayToast(message) {
 }
 
 function createInjectorCard(brand, injector, isDuplicate, groupDescription) {
-	injector.offsets = Object.fromEntries(Object.entries(injector.offsets).sort((a, b) => a[0].localeCompare(b[0]))); // Sort offsets
+	injector.offsets = Object.fromEntries(Object.entries(injector.offsets).sort((a, b) => parseFloat(b[1]) - parseFloat(a[1]))); // Sort offsets
 
 	const issueDescription = `${brand} ${injector.cc}CC ${injector.ohm}Ω ${groupDescription ? `(${groupDescription})` : ""}`.replace(/\s+/g, " ").trim();
 
@@ -142,7 +142,7 @@ function filterInjectors(searchTerm) {
 				(injector.description?.toLowerCase().includes(term) ?? false) ||
 				(injector.cc?.toString().includes(term) ?? false) ||
 				(injector.ohm?.toString().includes(term) ?? false)
-			)) return true
+			)) return true;
 	
 			return (injector.injectors || []).some(nestedInjector => 
 				terms.every(term => 
@@ -150,10 +150,10 @@ function filterInjectors(searchTerm) {
 					(nestedInjector.cc?.toString().includes(term) ?? false) ||
 					(nestedInjector.ohm?.toString().includes(term) ?? false)
 				)
-			)
+			);
 		})
 	
-		if (filteredInjectors.length > 0) filtered[brand] = filteredInjectors
+		if (filteredInjectors.length > 0) filtered[brand] = filteredInjectors;
 	}
 
 	return filtered;
