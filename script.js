@@ -8,8 +8,9 @@ fetch("injector-data.json")
 	injectorData = data;
 	
 	// Get search term from local storage
-	const searchTerm = typeof localStorage !== "undefined" ? localStorage.getItem("searchTerm") || "" : "";
+	const searchTerm = (new URLSearchParams(window.location.search)).get("searchTerm") || (typeof localStorage !== "undefined" ? localStorage.getItem("searchTerm") || "" : "");
 	searchBar.value = searchTerm;
+
 	searchInjectors(searchTerm);
 	
 	if (!window.location.port) searchBar.focus(); // Annoying with live preview
@@ -168,12 +169,21 @@ function searchInjectors(searchTerm = "") { // Empty string to reset search
 }
 
 const searchBar = document.getElementById("searchBar");
+let searchDebounce;
+
 searchBar.addEventListener("input", e => {
 	const text = e.target.value;
 
-	searchInjectors(text);
+	clearTimeout(searchDebounce);
+	searchDebounce = setTimeout(() => {
+		const url = new URL(window.location.href);
+		text ? url.searchParams.set("searchTerm", text) : url.searchParams.delete("searchTerm");
+		window.history.replaceState({}, "", url);
 
-	localStorage.setItem("searchTerm", text);
+		searchInjectors(text);
+
+		localStorage.setItem("searchTerm", text);
+	}, 300);
 });
 searchBar.addEventListener("keydown", e => {
 	// Only allow alphanumeric characters, backspace, space, and enter
