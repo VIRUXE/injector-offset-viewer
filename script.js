@@ -55,8 +55,6 @@ function renderPressureBatteryOffsetComponent(pressures) {
 }
 
 function createInjectorCard(brand, injector, isDuplicate, group) {
-	if (!group) injector.offsets = Object.fromEntries(Object.entries(injector.offsets).sort((a, b) => parseFloat(b[1]) - parseFloat(a[1]))); // Sort offsets
-
 	const issueDescription = group ? 
 		`${brand} ${group.description}`.replace(/\s+/g, ' ').trim() : 
 		`${brand} ${injector.cc}CC ${injector.ohm}Ω ${group?.description ? `(${group.description})` : ''}`.replace(/\s+/g, ' ').trim();
@@ -69,7 +67,7 @@ function createInjectorCard(brand, injector, isDuplicate, group) {
 		<p title="Double-click to change Flow Unit"><strong>Capacity:</strong> <span class="detail" style="cursor: help;"><span>${injector.cc}</span> CC/min</span>${injector.pressure ? ` at <span class="detail"><span>${injector.pressure}</span> PSI</span>` : ""}</p>
 		${injector.ohm ? `<p><strong>Impedance:</strong> <span class="detail"><span>${injector.ohm}</span> Ω</span></p>` : ""}
 		<div class="offsets-container">
-			${group?.pressureOffsets ? renderPressureBatteryOffsetComponent(group.pressureOffsets) : renderBatteryOffsetTable(injector.offsets)}
+			${group ? renderPressureBatteryOffsetComponent(group.injectors) : renderBatteryOffsetTable(injector.offsets)}
 			<a class="detail" href="https://github.com/VIRUXE/injector-offset-viewer/issues/new?assignees=VIRUXE&labels=injector-data,website-submitted&projects=&template=wrong-offsets.md&title=Wrong+Offsets+for+${issueDescription}" target="_blank" title="Submit an Issue on GitHub">Are these offsets wrong?</a>
 		</div>
 	`;
@@ -152,17 +150,10 @@ function displayInjectors(data = injectorData) {
 			const items   = isGroup ? node.injectors : [node];  // If it's a group, use the injectors/items inside it
 			
 			if (isGroup) {
-				if (items.every(i => i.pressure)) { // If all items in the group have pressure values
-					// Change property name node.injectors to node.pressureOffsets
-					// This is to make the code more readable and to avoid confusion
-					// * This is a bit hacky but it's fine, until I get some balls to change the JSON file
-					node.pressureOffsets = node.injectors;
-					delete node.injectors;
-
+				if (items.every(i => i.pressure)) // If all items in the group have pressure values
 					addCard(brand, items.find(i => i.pressure === 43.5) || items[0], false, node);
-				} else {
+				else
 					items.forEach(injector => addCard(brand, injector, false, node));
-				}
 			} else {
 				items.sort((a, b) => a.cc - b.cc); // Sort by CC
 				items.forEach(injector => 
