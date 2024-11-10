@@ -27,9 +27,7 @@ a {
 	transition: color 0.3s ease;
 }
 
-a:hover, a:visited {
-	color: #CCC;
-}
+a:hover, a:visited { color: #CCC; }
 
 #toast {
 	display         : none;
@@ -95,6 +93,7 @@ a:hover, a:visited {
 }
 
 #injectorGrid {
+	position             : relative;
 	display              : grid;
 	width                : 100%;
 	margin-top           : 20px;
@@ -104,6 +103,7 @@ a:hover, a:visited {
 }
 
 .injector-card {
+	position        : relative;
 	border          : 1px solid var(--injector-card-border-color);
 	font-size       : smaller;
 	background-color: var(--injector-card-background-color);
@@ -113,6 +113,7 @@ a:hover, a:visited {
 	transition      : all 0.3s ease;
 	overflow        : hidden;
 	color           : var(--text-color);
+	height          : 90px;
 }
 
 .injector-card:hover {
@@ -120,9 +121,7 @@ a:hover, a:visited {
 	box-shadow: 0 5px 15px var(--injector-card-hover-shadow-color);
 }
 
-.injector-card:hover h3 {
-	color: var(--gold);
-}
+.injector-card:hover h3 { color: var(--gold); }
 
 .injector-card h3 {
 	margin-top: 0;
@@ -148,10 +147,9 @@ a:hover, a:visited {
 
 /* Table Container */
 .injector-card .offsets-container {
-	height    : 0;
-	overflow  : hidden;
-	transition: height 0.5s ease;
-	margin-top: 10px;
+	height       : 0;
+	overflow     : hidden;
+	transition   : all 0.5s ease;
 }
 
 .injector-card .offsets-container a.detail {
@@ -160,13 +158,9 @@ a:hover, a:visited {
 	text-decoration: none;
 }
 
-.injector-card .offsets-container a.detail:hover {
-	color: var(--gold);
-}
+.injector-card .offsets-container a.detail:hover { color: var(--gold); }
 
-.injector-card .offsets-container .pressure-control {
-	margin-bottom: 10px;
-}
+.injector-card .offsets-container .pressure-control { margin-bottom: 10px; }
 
 .injector-card .offsets-container .pressure-control .pressure-tabs {
 	display        : flex;
@@ -201,12 +195,10 @@ a:hover, a:visited {
 
 /* Only exists inside cards */
 table {
-	/* margin          : 10px 0; */
 	border-collapse : collapse;
 	text-align      : center;
 	border          : 1px solid var(--table-border-color);
 	width           : 100%;
-	transition      : opacity 500ms ease-in-out;
 	background-color: var(--injector-card-background-color);
 	color           : var(--text-color);
 }
@@ -216,13 +208,9 @@ td, th {
 	transition: all 500ms ease;
 }
 
-th:hover, td:hover {
-	color: var(--gold);
-}
+th:hover, td:hover { color: var(--gold); }
 
-table:hover {
-	cursor: copy;
-}
+table:hover { cursor: copy; }
 
 tr:nth-child(odd) {
 	background-color: var(--table-odd-row-background-color);

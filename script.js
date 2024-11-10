@@ -126,20 +126,25 @@ function displayInjectors(data = injectorData) {
 
 	function addCard(brand, injector, isDuplicate, group) {
 		const card = createInjectorCard(brand, injector, isDuplicate, group);
-
+		
 		grid.appendChild(card);
-
-		const tableContainer = card.getElementsByClassName("offsets-container")[0];
-		const table          = tableContainer.getElementsByTagName("table")[0];
+		
+		const offsetsContainer  = card.getElementsByClassName("offsets-container")[0];
+		const defaultHeight = card.computedStyleMap().get("height").value;
 
 		card.addEventListener("mouseenter", () => {
-			tableContainer.style.height = `${tableContainer.scrollHeight}px`;
-			table.style.opacity         = 1;
+			card.animate( { height: [`${defaultHeight}px`, `${defaultHeight + offsetsContainer.scrollHeight}px`] }, { duration: 250, fill: "forwards" });
+
+			offsetsContainer.animate(
+				{ marginTop: [0, '10px'], height: [0, `${offsetsContainer.scrollHeight}px`], opacity: [0, 1] }, { duration: 250, fill: "forwards" });
 		});
 
 		card.addEventListener("mouseleave", () => {
-			tableContainer.style.height = 0;
-			table.style.opacity         = 0;
+			card.animate( { height: [`${defaultHeight + offsetsContainer.scrollHeight}px`, `${defaultHeight}px`] }, { duration: 250, fill: "forwards" });
+
+			offsetsContainer.animate(
+				{ marginTop: ['10px', 0], height: [`${offsetsContainer.scrollHeight}px`, 0], opacity: [1, 0] }, { duration: 250, fill: "forwards" }
+			);
 		});
 	}
 
@@ -220,11 +225,11 @@ const searchBar = document.getElementById("searchBar");
 let searchDebounce;
 
 searchBar.addEventListener("input", e => {
-	const text = e.target.value;
-
 	clearTimeout(searchDebounce);
 	searchDebounce = setTimeout(() => {
-		const url = new URL(window.location.href);
+		const text = e.target.value;
+		const url  = new URL(window.location.href);
+
 		text ? url.searchParams.set("searchTerm", text) : url.searchParams.delete("searchTerm");
 		window.history.replaceState({}, "", url);
 
@@ -271,7 +276,7 @@ setInterval(() => {
 	hint.style.opacity = 0;
 
 	setTimeout(() => {
-		hint.innerHTML   = hints[currentHint];
+		hint.innerHTML = hints[currentHint];
 		hint.style.opacity = 1;
 		currentHint = (currentHint + 1) % hints.length;
 	}, hint.computedStyleMap().get("transition-duration").value * 1000);
