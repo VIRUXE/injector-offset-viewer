@@ -147,24 +147,61 @@ a:hover, a:visited {
 }
 
 /* Table Container */
-.injector-card .table-container {
-	height          : 0;
-	overflow        : hidden;
-	transition      : height 0.5s ease;
+.injector-card .offsets-container {
+	height    : 0;
+	overflow  : hidden;
+	transition: height 0.5s ease;
+	margin-top: 10px;
 }
 
-.injector-card .table-container .detail a {
-	color: var(--injector-card-detail-border-color);
+.injector-card .offsets-container a.detail {
+	margin-top     : 10px;
+	color          : var(--injector-card-detail-border-color);
 	text-decoration: none;
 }
 
-.injector-card .table-container .detail a:hover {
+.injector-card .offsets-container a.detail:hover {
 	color: var(--gold);
+}
+
+.injector-card .offsets-container .pressure-control {
+	margin-bottom: 10px;
+}
+
+.injector-card .offsets-container .pressure-control .pressure-tabs {
+	display        : flex;
+	justify-content: center;
+	align-items    : center;
+	flex-wrap      : wrap;
+	gap            : 10px;
+	margin-bottom  : 10px;
+}
+
+.injector-card .offsets-container .pressure-control .pressure-tabs button {
+	border          : 1px solid var(--injector-card-detail-border-color);
+	background-color: var(--button-background-color);
+	font-weight     : bold;
+	color           : var(--gold);
+	border-radius   : 5px;
+	margin-right    : 5px;
+	padding         : 5px 10px;
+	cursor          : pointer;
+	transition      : all 0.3s ease, color 0.3s ease-in-out;
+}
+
+.injector-card .offsets-container .pressure-control .pressure-tabs button:hover {
+	background-color: var(--gold);
+	color           : var(--background-color);
+}
+
+.injector-card .offsets-container .pressure-control .pressure-tabs button.active {
+	background-color: var(--gold);
+	color           : var(--background-color);
 }
 
 /* Only exists inside cards */
 table {
-	margin          : 10px 0;
+	/* margin          : 10px 0; */
 	border-collapse : collapse;
 	text-align      : center;
 	border          : 1px solid var(--table-border-color);

@@ -28,32 +28,56 @@ function displayToast(message) {
 		toast.animate({ display: "none", opacity: [1, 0] }, { duration: 1000, fill: "forwards", easing: "ease-in-out" });
 }
 
-function createInjectorCard(brand, injector, isDuplicate, groupDescription) {
-	injector.offsets = Object.fromEntries(Object.entries(injector.offsets).sort((a, b) => parseFloat(b[1]) - parseFloat(a[1]))); // Sort offsets
+function renderBatteryOffsetTable(offsets, show) {
+	if (show === undefined) show = true;
 
-	const issueDescription = `${brand} ${injector.cc}CC ${injector.ohm}Ω ${groupDescription ? `(${groupDescription})` : ""}`.replace(/\s+/g, " ").trim();
+	offsets = Object.fromEntries(Object.entries(offsets).sort((a, b) => parseFloat(b[1]) - parseFloat(a[1])))
+
+	return `
+		<table title="Click to copy the value." cellpadding="3px"${show ? "" : " style=\"display: none;\""}>
+			<tr>${Object.keys(offsets).map(v => `<th>${v}</th>`).join("")}</tr>
+			<tr>${Object.values(offsets).map(l => `<td>${l}</td>`).join("")}</tr>
+		</table>
+	`;
+}
+
+function renderPressureBatteryOffsetComponent(pressures) {
+	return `
+		<div class="pressure-control">
+			<div class="pressure-tabs">
+				${pressures.map(p => `<button title="${p.cc}CC" ${p.pressure === 43.5 ? 'class="active"' : ''}>${p.pressure} psi</button>`).join("")}
+			</div>
+			<div class="pressure-tables">
+				${pressures.map(p => renderBatteryOffsetTable(p.offsets, p.pressure === 43.5)).join("")}
+			</div>
+		</div>
+	`;
+}
+
+function createInjectorCard(brand, injector, isDuplicate, group) {
+	if (!group) injector.offsets = Object.fromEntries(Object.entries(injector.offsets).sort((a, b) => parseFloat(b[1]) - parseFloat(a[1]))); // Sort offsets
+
+	const issueDescription = group ? 
+		`${brand} ${group.description}`.replace(/\s+/g, ' ').trim() : 
+		`${brand} ${injector.cc}CC ${injector.ohm}Ω ${group?.description ? `(${group.description})` : ''}`.replace(/\s+/g, ' ').trim();
 
 	const card = document.createElement("div");
 	card.className = "injector-card";
 	card.innerHTML = `
 		<h3>${brand}${isDuplicate ? ' <span class="warning-triangle" title="There are other injector-cards with the same Capacity and Impendance.">⚠️</span>' : ""}</h3>
-		${groupDescription ? `<p><strong>Group:</strong> ${groupDescription}</p>` : ""}
-		${injector.description ? `<p><strong>Description:</strong> ${injector.description}</p>` : ""}
+		${group ? `<p><strong>Group:</strong> ${group.description}</p>` : injector.description ? `<p><strong>Description:</strong> ${injector.description}</p>` : ""}
 		<p title="Double-click to change Flow Unit"><strong>Capacity:</strong> <span class="detail" style="cursor: help;"><span>${injector.cc}</span> CC/min</span>${injector.pressure ? ` at <span class="detail"><span>${injector.pressure}</span> PSI</span>` : ""}</p>
 		${injector.ohm ? `<p><strong>Impedance:</strong> <span class="detail"><span>${injector.ohm}</span> Ω</span></p>` : ""}
-		<div class="table-container">
-			<table title="Click to copy the value." cellpadding="3px">
-				<tr>${Object.keys(injector.offsets).map(v => `<th>${v}</th>`).join("")}</tr>
-				<tr>${Object.values(injector.offsets).map(l => `<td>${l}</td>`).join("")}</tr>
-			</table>
-			<span class="detail"><a href="https://github.com/VIRUXE/injector-offset-viewer/issues/new?assignees=VIRUXE&labels=injector-data,website-submitted&projects=&template=wrong-offsets.md&title=Wrong+Offsets+for+${issueDescription}" target="_blank" title="Submit an Issue on GitHub">Are these offsets wrong?</a></span>
+		<div class="offsets-container">
+			${group?.pressureOffsets ? renderPressureBatteryOffsetComponent(group.pressureOffsets) : renderBatteryOffsetTable(injector.offsets)}
+			<a class="detail" href="https://github.com/VIRUXE/injector-offset-viewer/issues/new?assignees=VIRUXE&labels=injector-data,website-submitted&projects=&template=wrong-offsets.md&title=Wrong+Offsets+for+${issueDescription}" target="_blank" title="Submit an Issue on GitHub">Are these offsets wrong?</a>
 		</div>
 	`;
 	
 	// Convert capacity unit on double-click 
 	const getCapacityParagraph = card => Array.from(card.getElementsByTagName("p")).find(p => p.textContent.includes("Capacity"));
 
-	getCapacityParagraph(card).addEventListener("dblclick", () => {
+	getCapacityParagraph(card)?.addEventListener("dblclick", () => {
 		const CONVERSION_FACTOR = 0.09583;
 
 		document.querySelectorAll(".injector-card").forEach(card => {
@@ -73,6 +97,24 @@ function createInjectorCard(brand, injector, isDuplicate, groupDescription) {
 			.then(() => displayToast('Copied to clipboard!'))
 			.catch(() => displayToast('Failed to copy to clipboard!'))
 	));
+
+	// For every button inside "offsets-container" div, add event listener to switch between tables
+	card.querySelectorAll(".pressure-tabs button").forEach((button, index) => {
+		button.addEventListener("click", () => {
+			const tables = card.querySelectorAll(".pressure-tables table");
+
+			card.querySelector(".pressure-tabs button.active")?.classList.remove("active");
+			const visibleTable = Array.from(tables).find(t => t.style.display !== "none");
+			visibleTable.animate({ opacity: [1, 0] }, { duration: 200, fill: "forwards" }).onfinish = () => {
+				visibleTable.style.display = "none";
+				tables[index].style.display = "table";
+				tables[index].animate({ opacity: [0, 1] }, { duration: 200, fill: "forwards" });
+			};
+
+			// tables[index].style.display = "table";
+			button.classList.add("active");
+		});
+	});
 	
 	return card;
 }
@@ -84,38 +126,53 @@ function displayInjectors(data = injectorData) {
 
 	grid.innerHTML = "";
 
+	function addCard(brand, injector, isDuplicate, group) {
+		const card = createInjectorCard(brand, injector, isDuplicate, group);
+
+		grid.appendChild(card);
+
+		const tableContainer = card.getElementsByClassName("offsets-container")[0];
+		const table          = tableContainer.getElementsByTagName("table")[0];
+
+		card.addEventListener("mouseenter", () => {
+			tableContainer.style.height = `${tableContainer.scrollHeight}px`;
+			table.style.opacity         = 1;
+		});
+
+		card.addEventListener("mouseleave", () => {
+			tableContainer.style.height = 0;
+			table.style.opacity         = 0;
+		});
+	}
+
 	for (const [brand, node] of Object.entries(data)) {
 		node.sort((a, b) => a.cc - b.cc); // Sort by CC
 		node.forEach(node => {
-			const isGroup   = node.injectors !== undefined;       // It's a group if "node" contains "injectors"
-			const injectors = isGroup ? node.injectors : [node];  // If it's a group, use the injectors inside it
+			const isGroup = node.injectors !== undefined;       // It's a group if "node" contains "injectors". I'm not renaming the entire JSON file for this
+			const items   = isGroup ? node.injectors : [node];  // If it's a group, use the injectors/items inside it
 			
-			injectors.sort((a, b) => a.cc - b.cc); // Sort by CC
-			injectors.forEach(injector => {
-				const isDuplicate = injectors.some(i => 
-					i     !== injector &&
-					i.cc  === injector.cc &&
-					i.ohm === injector.ohm
+			if (isGroup) {
+				if (items.every(i => i.pressure)) { // If all items in the group have pressure values
+					// Change property name node.injectors to node.pressureOffsets
+					// This is to make the code more readable and to avoid confusion
+					// * This is a bit hacky but it's fine, until I get some balls to change the JSON file
+					node.pressureOffsets = node.injectors;
+					delete node.injectors;
+
+					addCard(brand, items.find(i => i.pressure === 43.5) || items[0], false, node);
+				} else {
+					items.forEach(injector => addCard(brand, injector, false, node));
+				}
+			} else {
+				items.sort((a, b) => a.cc - b.cc); // Sort by CC
+				items.forEach(injector => 
+					addCard(brand, injector, items.some(i => 
+						i     !== injector &&
+						i.cc  === injector.cc &&
+						i.ohm === injector.ohm
+					), isGroup ? node : null)
 				);
-
-				const card = createInjectorCard(brand, injector, isDuplicate, isGroup ? node.description : null);
-
-				grid.appendChild(card);
-
-				const tableContainer = card.getElementsByClassName("table-container")[0];
-				const table          = tableContainer.getElementsByTagName("table")[0];
-				const tableHeight    = tableContainer.scrollHeight;
-
-				card.addEventListener("mouseenter", () => {
-					tableContainer.style.height = `${tableHeight}px`;
-					table.style.opacity         = 1;
-				});
-
-				card.addEventListener("mouseleave", () => {
-					tableContainer.style.height = 0;
-					table.style.opacity         = 0;
-				});
-			});
+			}
 		});
 	}
 
