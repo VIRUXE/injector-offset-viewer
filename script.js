@@ -1,26 +1,25 @@
 const toast = document.getElementById("toast");
-
 let injectorData = {};
 
-fetch("injector-data.json")
-.then(response => response.json())
-.then(data => {
-	injectorData = data;
-	
-	// Get search term from local storage
-	const searchTerm = (new URLSearchParams(window.location.search)).get("searchTerm") || (typeof localStorage !== "undefined" ? localStorage.getItem("searchTerm") || "" : "");
-	searchBar.value = searchTerm;
+(async () => {
+    try {
+        const response = await fetch("injector-data.json");
+        injectorData = await response.json();
+        
+        const params = new URLSearchParams(window.location.search);
+        const searchTerm = params.get("searchTerm") ?? localStorage?.getItem("searchTerm") ?? "";
+        searchBar.value = searchTerm;
 
-	searchInjectors(searchTerm);
-	
-	if (!window.location.port) searchBar.focus(); // Annoying with live preview
-	searchBar.setSelectionRange(0, searchBar.value.length);
-})
-.catch(error => {
-	const message = error instanceof SyntaxError ? "Failed to parse data!" : "Failed to load data!";
-	displayToast(message);
-	console.error(message, error);
-});
+        searchInjectors(searchTerm);
+        
+        if (!window.location.port) searchBar.focus();
+        searchBar.setSelectionRange(0, searchBar.value.length);
+    } catch (error) {
+        const message = error instanceof SyntaxError ? "Failed to parse data!" : "Failed to load data!";
+        displayToast(message);
+        console.error(message, error);
+    }
+})();
 
 function displayToast(message) {
 	toast.textContent = message;
@@ -28,18 +27,16 @@ function displayToast(message) {
 		toast.animate({ display: "none", opacity: [1, 0] }, { duration: 1000, fill: "forwards", easing: "ease-in-out" });
 }
 
-function renderBatteryOffsetTable(offsets, show) {
-	if (show === undefined) show = true;
+const renderBatteryOffsetTable = (offsets, show = true) => {
+    const offsets = Object.fromEntries(Object.entries(offsets).sort(([,a], [,b]) => parseFloat(b) - parseFloat(a)));
 
-	offsets = Object.fromEntries(Object.entries(offsets).sort((a, b) => parseFloat(b[1]) - parseFloat(a[1])))
-
-	return `
-		<table title="Click to copy the value." cellpadding="3px"${show ? "" : " style=\"display: none;\""}>
-			<tr>${Object.keys(offsets).map(v => `<th>${v}</th>`).join("")}</tr>
-			<tr>${Object.values(offsets).map(l => `<td>${l}</td>`).join("")}</tr>
-		</table>
-	`;
-}
+    return `
+        <table title="Click to copy the value." cellpadding="3px"${show ? "" : ' style="display: none;"'}>
+            <tr>${Object.keys(offsets).map(v => `<th>${v}</th>`).join("")}</tr>
+            <tr>${Object.values(offsets).map(l => `<td>${l}</td>`).join("")}</tr>
+        </table>
+    `;
+};
 
 function renderPressureBatteryOffsetComponent(pressures) {
     return `
@@ -185,35 +182,31 @@ function displayInjectors(data = injectorData) {
 	}, 0) + " injectors in total.";
 }
 
-function filterInjectors(searchTerm) {
-	if (searchTerm.startsWith(" ")) return injectorData;
+const filterInjectors = searchTerm => {
+    if (searchTerm.startsWith(" ")) return injectorData;
 
-	const filtered = {};
-
-	const terms = searchTerm.split(" ");
-	for (const [brand, injectors] of Object.entries(injectorData)) {
-		const filteredInjectors = injectors.filter(injector => {
-			if (terms.every(term => 
-				brand.toLowerCase().includes(term) ||
-				(injector.description?.toLowerCase().includes(term) ?? false) ||
-				(injector.cc?.toString().includes(term) ?? false) ||
-				(injector.ohm?.toString().includes(term) ?? false)
-			)) return true;
-	
-			return (injector.injectors || []).some(nestedInjector => 
-				terms.every(term => 
-					(nestedInjector.description?.toLowerCase().includes(term) ?? false) ||
-					(nestedInjector.cc?.toString().includes(term) ?? false) ||
-					(nestedInjector.ohm?.toString().includes(term) ?? false)
-				)
-			);
-		})
-	
-		if (filteredInjectors.length > 0) filtered[brand] = filteredInjectors;
-	}
-
-	return filtered;
-}
+    return Object.fromEntries(
+        Object.entries(injectorData)
+            .map(([brand, injectors]) => [
+                brand,
+                injectors.filter(injector => {
+                    const terms = searchTerm.split(" ");
+                    return terms.every(term => 
+                        brand.toLowerCase().includes(term) ||
+                        injector.description?.toLowerCase().includes(term) ||
+                        injector.cc?.toString().includes(term) ||
+                        injector.ohm?.toString().includes(term) ||
+                        injector.injectors?.some(nested => 
+                            nested.description?.toLowerCase().includes(term) ||
+                            nested.cc?.toString().includes(term) ||
+                            nested.ohm?.toString().includes(term)
+                        )
+                    );
+                })
+            ])
+            .filter(([, injectors]) => injectors.length > 0)
+    );
+};
 
 function searchInjectors(searchTerm = "") { // Empty string to reset search
 	const filteredData = filterInjectors(searchTerm.toLowerCase());
@@ -304,22 +297,22 @@ topElement.addEventListener("click", () => {
 });
 
 // Interactions for PayPal donation callbacks
-const urlParams = new URLSearchParams(window.location.search);
-if (urlParams.has('thanks')) { 
-	displayToast("Thank you for your support!");
+const { thanks, cancelledDonation } = Object.fromEntries(new URLSearchParams(window.location.search));
 
-	const thankYouMessage = document.createElement("p");
-
-	with (thankYouMessage) {
-		textContent     = "THANK YOU FOR YOUR SUPPORT!";
-		style.fontSize  = "larger";
-		style.textAlign = "center";
-		style.margin    = "2em 0";
-	}
-
-	document.body.insertBefore(thankYouMessage, document.body.firstChild);
-} else if (urlParams.has('cancelledDonation')) {
-	displayToast("Donation Cancelled!");
+if (thanks) {
+    displayToast("Thank you for your support!");
+    const thankYouMessage = document.createElement("p");
+    Object.assign(thankYouMessage, {
+        textContent: "THANK YOU FOR YOUR SUPPORT!",
+        style: {
+            fontSize: "larger",
+            textAlign: "center",
+            margin: "2em 0"
+        }
+    });
+    document.body.prepend(thankYouMessage);
+} else if (cancelledDonation) {
+    displayToast("Donation Cancelled!");
 }
 
 // Mobile stuff
@@ -336,10 +329,17 @@ if (/Android|webOS|iPhone|iPad|iPod|IEMobile|Opera Mini/i.test(navigator.userAge
 }
 
 // Retrieve last update date from GitHub API
-fetch("https://api.github.com/repos/VIRUXE/injector-offset-viewer/commits")
-.then(response => response.json())
-.then(data => {
-	// Index 1 because the first commit will be from github-actions
-	document.getElementsByTagName("footer")[0].insertAdjacentHTML("afterbegin", `<p title="Latest commit: '${data[1].commit.message}'">Last updated: ${new Date(data[0].commit.author.date).toLocaleString()}</p>`);
-})
-.catch(error => console.error("Failed to retrieve last update date!", error));
+(async () => {
+    try {
+        const response = await fetch("https://api.github.com/repos/VIRUXE/injector-offset-viewer/commits");
+        const data = await response.json();
+        const { commit: { message, author: { date } } } = data[1];
+        const footer = document.querySelector("footer");
+        footer.insertAdjacentHTML(
+            "afterbegin", 
+            `<p title="Latest commit: '${message}'">Last updated: ${new Date(date).toLocaleString()}</p>`
+        );
+    } catch (error) {
+        console.error("Failed to retrieve last update date!", error);
+    }
+})();
