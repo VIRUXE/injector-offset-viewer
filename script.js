@@ -28,12 +28,12 @@ function displayToast(message) {
 }
 
 const renderBatteryOffsetTable = (offsets, show = true) => {
-    const offsets = Object.fromEntries(Object.entries(offsets).sort(([,a], [,b]) => parseFloat(b) - parseFloat(a)));
+    const sortedOffsets = Object.fromEntries(Object.entries(offsets).sort(([,a], [,b]) => parseFloat(b) - parseFloat(a)));
 
     return `
         <table title="Click to copy the value." cellpadding="3px"${show ? "" : ' style="display: none;"'}>
-            <tr>${Object.keys(offsets).map(v => `<th>${v}</th>`).join("")}</tr>
-            <tr>${Object.values(offsets).map(l => `<td>${l}</td>`).join("")}</tr>
+            <tr>${Object.keys(sortedOffsets).map(v => `<th>${v}</th>`).join("")}</tr>
+            <tr>${Object.values(sortedOffsets).map(l => `<td>${l}</td>`).join("")}</tr>
         </table>
     `;
 };
