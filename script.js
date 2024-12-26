@@ -42,35 +42,37 @@ function renderBatteryOffsetTable(offsets, show) {
 }
 
 function renderPressureBatteryOffsetComponent(pressures) {
-	return `
-		<div class="pressure-control">
-			<div class="pressure-tabs">
-				${pressures.map(p => `<button title="${p.cc}CC" ${p.pressure === 43.5 ? 'class="active"' : ''}>${p.pressure} psi</button>`).join("")}
-			</div>
-			<div class="pressure-tables">
-				${pressures.map(p => renderBatteryOffsetTable(p.offsets, p.pressure === 43.5)).join("")}
-			</div>
-		</div>
-	`;
+    return `
+        <div class="pressure-control">
+            <div class="pressure-tabs">
+                ${pressures.map(p => `<button title="${p.cc}CC" ${!p.pressure || p.pressure === 43.5 ? 'class="active"' : ''}>${p.pressure || 43.5} psi</button>`).join("")}
+            </div>
+            <div class="pressure-tables">
+                ${pressures.map(p => renderBatteryOffsetTable(p.offsets, !p.pressure || p.pressure === 43.5)).join("")}
+            </div>
+        </div>
+    `;
 }
 
 function createInjectorCard(brand, injector, isDuplicate, group) {
-	const issueDescription = group ? 
-		`${brand} ${group.description}`.replace(/\s+/g, ' ').trim() : 
-		`${brand} ${injector.cc}CC ${injector.ohm}Ω ${group?.description ? `(${group.description})` : ''}`.replace(/\s+/g, ' ').trim();
+    const issueDescription = group ? 
+        `${brand} ${group.description}`.replace(/\s+/g, ' ').trim() : 
+        `${brand} ${injector.cc}CC ${injector.ohm}Ω ${group?.description ? `(${group.description})` : ''}`.replace(/\s+/g, ' ').trim();
 
-	const card = document.createElement("div");
-	card.className = "injector-card";
-	card.innerHTML = `
-		<h3>${brand}${isDuplicate ? ' <span class="warning-triangle" title="There are other injector-cards with the same Capacity and Impendance.">⚠️</span>' : ""}</h3>
-		${group ? `<p><strong>Group:</strong> ${group.description}</p>` : injector.description ? `<p><strong>Description:</strong> ${injector.description}</p>` : ""}
-		<p title="Double-click to change Flow Unit"><strong>Capacity:</strong> <span class="detail" style="cursor: help;"><span>${injector.cc}</span> CC/min</span>${injector.pressure ? ` at <span class="detail"><span>${injector.pressure}</span> PSI</span>` : ""}</p>
-		${injector.ohm ? `<p><strong>Impedance:</strong> <span class="detail"><span>${injector.ohm}</span> Ω</span></p>` : ""}
-		<div class="offsets-container">
-			${group ? renderPressureBatteryOffsetComponent(group.injectors) : renderBatteryOffsetTable(injector.offsets)}
-			<a class="detail" href="https://github.com/VIRUXE/injector-offset-viewer/issues/new?assignees=VIRUXE&labels=injector-data,website-submitted&projects=&template=wrong-offsets.md&title=Wrong+Offsets+for+${issueDescription}" target="_blank" title="Submit an Issue on GitHub">Are these offsets wrong?</a>
-		</div>
-	`;
+    const hasMultiplePressures = group?.injectors && group.injectors.length > 1 && group.injectors.every(i => i.pressure);
+
+    const card = document.createElement("div");
+    card.className = "injector-card";
+    card.innerHTML = `
+        <h3>${brand}${isDuplicate ? ' <span class="warning-triangle" title="There are other injector-cards with the same Capacity and Impendance.">⚠️</span>' : ""}</h3>
+        ${group ? `<p><strong>Group:</strong> ${group.description}</p>` : injector.description ? `<p><strong>Description:</strong> ${injector.description}</p>` : ""}
+        <p title="Double-click to change Flow Unit"><strong>Capacity:</strong> <span class="detail" style="cursor: help;"><span>${injector.cc}</span> CC/min</span>${injector.pressure ? ` at <span class="detail"><span>${injector.pressure}</span> PSI</span>` : ""}</p>
+        ${injector.ohm ? `<p><strong>Impedance:</strong> <span class="detail"><span>${injector.ohm}</span> Ω</span></p>` : ""}
+        <div class="offsets-container">
+            ${hasMultiplePressures ? renderPressureBatteryOffsetComponent(group.injectors) : renderBatteryOffsetTable(injector.offsets)}
+            <a class="detail" href="https://github.com/VIRUXE/injector-offset-viewer/issues/new?assignees=VIRUXE&labels=injector-data,website-submitted&projects=&template=wrong-offsets.md&title=Wrong+Offsets+for+${issueDescription}" target="_blank" title="Submit an Issue on GitHub">Are these offsets wrong?</a>
+        </div>
+    `;
 	
 	// Convert capacity unit on double-click 
 	const getCapacityParagraph = card => Array.from(card.getElementsByTagName("p")).find(p => p.textContent.includes("Capacity"));
@@ -152,7 +154,7 @@ function displayInjectors(data = injectorData) {
 		node.sort((a, b) => a.cc - b.cc); // Sort by CC
 		node.forEach(node => {
 			const isGroup = node.injectors !== undefined;       // It's a group if "node" contains "injectors". I'm not renaming the entire JSON file for this
-			const items   = isGroup ? node.injectors : [node];  // If it's a group, use the injectors/items inside it
+			const items   = isGroup ? node.injectors : [node];  // If it's a group, use the injectors/items prop inside it
 			
 			if (isGroup) {
 				if (items.every(i => i.pressure)) // If all items in the group have pressure values
