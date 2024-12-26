@@ -114,6 +114,7 @@ a:hover, a:visited { color: #CCC; }
 	overflow        : hidden;
 	color           : var(--text-color);
 	height          : 90px;
+	cursor          : pointer;
 }
 
 .injector-card:hover {
@@ -212,7 +213,7 @@ td, th {
 
 th:hover, td:hover { color: var(--gold); }
 
-table:hover { cursor: copy; }
+table:hover { cursor: grab; }
 
 tr:nth-child(odd) {
 	background-color: var(--table-odd-row-background-color);

@@ -130,19 +130,31 @@ function displayInjectors(data = injectorData) {
 		
 		const offsetsContainer = card.getElementsByClassName("offsets-container")[0];
 		const defaultHeight    = card.computedStyleMap().get("height").value;
+		let isExpanded = false;
 
-		card.addEventListener("mouseenter", () => {
-			card.animate( { height: [`${defaultHeight}px`, `${defaultHeight + offsetsContainer.scrollHeight}px`] }, { duration: 250, fill: "forwards" });
-
+		card.addEventListener("click", e => {
+			// Don't toggle if clicking table cells
+			if (e.target.matches('td, th')) return;
+			
+			isExpanded = !isExpanded;
+			
+			card.animate(
+				{ height: isExpanded ? 
+					[`${defaultHeight}px`, `${defaultHeight + offsetsContainer.scrollHeight}px`] : 
+					[`${defaultHeight + offsetsContainer.scrollHeight}px`, `${defaultHeight}px`] 
+				}, 
+				{ duration: 250, fill: "forwards" }
+			);
+	
 			offsetsContainer.animate(
-				{ marginTop: [0, '10px'], height: [0, `${offsetsContainer.scrollHeight}px`], opacity: [0, 1] }, { duration: 250, fill: "forwards" });
-		});
-
-		card.addEventListener("mouseleave", () => {
-			card.animate( { height: [`${defaultHeight + offsetsContainer.scrollHeight}px`, `${defaultHeight}px`] }, { duration: 250, fill: "forwards" });
-
-			offsetsContainer.animate(
-				{ marginTop: ['10px', 0], height: [`${offsetsContainer.scrollHeight}px`, 0], opacity: [1, 0] }, { duration: 250, fill: "forwards" }
+				{ 
+					marginTop: isExpanded ? [0, '10px'] : ['10px', 0], 
+					height: isExpanded ? 
+						[0, `${offsetsContainer.scrollHeight}px`] : 
+						[`${offsetsContainer.scrollHeight}px`, 0], 
+					opacity: isExpanded ? [0, 1] : [1, 0] 
+				}, 
+				{ duration: 250, fill: "forwards" }
 			);
 		});
 	}
