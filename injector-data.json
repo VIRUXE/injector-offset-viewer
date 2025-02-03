@@ -3170,7 +3170,7 @@
 					}
 				},
 				{
-					"description": "Pulsar GTi-R",
+					"description": "Pulsar GTi-R - SR20DET",
 					"cc": 444,
 					"ohm": 2,
 					"offsets": {
@@ -3188,6 +3188,7 @@
             "cc": 259,
             "ohm": 11,
             "offsets": {
+				"15.0": 0.42,
                 "14.0": 0.47,
                 "13.0": 0.56,
                 "12.0": 0.64,
@@ -3196,7 +3197,7 @@
             }
         },
         {
-            "description": "300zx(95-96)/SR20DET",
+            "description": "300zx(95-96) - SR20DET",
             "cc": 370,
             "ohm": 11,
             "offsets": {
@@ -3224,6 +3225,7 @@
             "cc": 250,
             "ohm": 11,
             "offsets": {
+				"15.0": 0.40,
                 "14.0": 0.47,
                 "13.0": 0.57,
                 "12.0": 0.69,
