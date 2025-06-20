@@ -1,6 +1,10 @@
 const toast = document.getElementById("toast");
 let injectorData = {};
 
+// Track created cards and their cleanup functions for proper memory management
+const cardCleanupMap = new WeakMap();
+const activeCards = new Set();
+
 (async () => {
     try {
         const response = await fetch("injector-data.json");
@@ -95,48 +99,82 @@ function createInjectorCard(brand, injector, isDuplicate, group) {
             <a class="detail" href="https://github.com/VIRUXE/injector-offset-viewer/issues/new?assignees=VIRUXE&labels=injector-data,website-submitted&projects=&template=wrong-offsets.md&title=Wrong+Offsets+for+${issueDescription}" target="_blank" title="Submit an Issue on GitHub">Are these offsets wrong?</a>
         </div>
     `;
+
+    // Array to store all event listeners for cleanup
+    const eventListeners = [];
 	
 	// Convert capacity unit on double-click 
 	const getCapacityParagraph = card => Array.from(card.getElementsByTagName("p")).find(p => p.textContent.includes("Capacity"));
 
-	getCapacityParagraph(card)?.addEventListener("dblclick", () => {
+	const capacityDblClickHandler = () => {
 		const CONVERSION_FACTOR = 0.09583;
 
-		document.querySelectorAll(".injector-card").forEach(card => {
-			const capacitySpan = getCapacityParagraph(card).querySelector("span");
-			const isCC         = capacitySpan.textContent.includes("CC");
-
-			const value    = parseFloat(capacitySpan.textContent);
+		// Only update active cards instead of querying the entire document
+		activeCards.forEach(activeCard => {
+			const capacitySpan = getCapacityParagraph(activeCard)?.querySelector("span");
+			if (!capacitySpan) return;
+			
+			const isCC = capacitySpan.textContent.includes("CC");
+			const value = parseFloat(capacitySpan.textContent);
 			const newValue = isCC ? (value * CONVERSION_FACTOR).toFixed(2) : (value / CONVERSION_FACTOR).toFixed(0);
 
 			capacitySpan.innerHTML = `<span>${newValue}</span> ${isCC ? "LB/hour" : "CC/min"}`;
 		});
-	});
+	};
+
+	const capacityParagraph = getCapacityParagraph(card);
+	if (capacityParagraph) {
+		capacityParagraph.addEventListener("dblclick", capacityDblClickHandler);
+		eventListeners.push(() => capacityParagraph.removeEventListener("dblclick", capacityDblClickHandler));
+	}
 
 	// Copy cell value to clipboard on click
-	card.querySelectorAll("th, td").forEach(cell => cell.addEventListener("click", e =>
+	const cellClickHandler = (e) => {
 		navigator.clipboard.writeText(e.target.textContent)
 			.then(() => displayToast('Copied to clipboard!'))
-			.catch(() => displayToast('Failed to copy to clipboard!'))
-	));
+			.catch(() => displayToast('Failed to copy to clipboard!'));
+	};
+
+	card.querySelectorAll("th, td").forEach(cell => {
+		cell.addEventListener("click", cellClickHandler);
+		eventListeners.push(() => cell.removeEventListener("click", cellClickHandler));
+	});
 
 	// For every button inside "offsets-container" div, add event listener to switch between tables
 	card.querySelectorAll(".pressure-tabs button").forEach((button, index) => {
-		button.addEventListener("click", () => {
+		const buttonClickHandler = () => {
 			const tables = card.querySelectorAll(".pressure-tables table");
 
 			card.querySelector(".pressure-tabs button.active")?.classList.remove("active");
 			const visibleTable = Array.from(tables).find(t => t.style.display !== "none");
-			visibleTable.animate({ opacity: [1, 0] }, { duration: 200, fill: "forwards" }).onfinish = () => {
-				visibleTable.style.display = "none";
+			
+			if (visibleTable) {
+				visibleTable.animate({ opacity: [1, 0] }, { duration: 200, fill: "forwards" }).onfinish = () => {
+					visibleTable.style.display = "none";
+					tables[index].style.display = "table";
+					tables[index].animate({ opacity: [0, 1] }, { duration: 200, fill: "forwards" });
+				};
+			} else {
+				// Fallback if no visible table found
 				tables[index].style.display = "table";
 				tables[index].animate({ opacity: [0, 1] }, { duration: 200, fill: "forwards" });
-			};
+			}
 
-			// tables[index].style.display = "table";
 			button.classList.add("active");
-		});
+		};
+
+		button.addEventListener("click", buttonClickHandler);
+		eventListeners.push(() => button.removeEventListener("click", buttonClickHandler));
 	});
+
+	// Store cleanup function for this card
+	cardCleanupMap.set(card, () => {
+		eventListeners.forEach(cleanup => cleanup());
+		activeCards.delete(card);
+	});
+
+	// Add to active cards set
+	activeCards.add(card);
 	
 	return card;
 }
@@ -146,18 +184,27 @@ function displayInjectors(data = injectorData) {
 	
 	const grid = document.getElementById("injectorGrid");
 
-	grid.innerHTML = "";
+	// Clean up existing cards and their event listeners
+	const existingCards = Array.from(grid.children);
+	existingCards.forEach(card => {
+		const cleanup = cardCleanupMap.get(card);
+		if (cleanup) {
+			cleanup();
+			cardCleanupMap.delete(card);
+		}
+	});
+
+	// Use DocumentFragment for efficient DOM manipulation
+	const fragment = document.createDocumentFragment();
 
 	function addCard(brand, injector, isDuplicate, group) {
 		const card = createInjectorCard(brand, injector, isDuplicate, group);
 		
-		grid.appendChild(card);
-		
 		const offsetsContainer = card.getElementsByClassName("offsets-container")[0];
-		const defaultHeight    = card.computedStyleMap().get("height").value;
+		const defaultHeight = card.computedStyleMap().get("height").value;
 		let isExpanded = false;
 
-		card.addEventListener("click", e => {
+		const cardClickHandler = (e) => {
 			// Don't toggle if clicking table cells
 			if (e.target.matches('td, th')) return;
 			
@@ -181,7 +228,18 @@ function displayInjectors(data = injectorData) {
 				}, 
 				{ duration: 250, fill: "forwards" }
 			);
+		};
+
+		card.addEventListener("click", cardClickHandler);
+		
+		// Add the card click handler to the cleanup function
+		const existingCleanup = cardCleanupMap.get(card);
+		cardCleanupMap.set(card, () => {
+			if (existingCleanup) existingCleanup();
+			card.removeEventListener("click", cardClickHandler);
 		});
+
+		fragment.appendChild(card);
 	}
 
 	for (const [brand, node] of Object.entries(data)) {
@@ -207,6 +265,10 @@ function displayInjectors(data = injectorData) {
 			}
 		});
 	}
+
+	// Clear the grid and append all new cards at once using DocumentFragment
+	grid.innerHTML = "";
+	grid.appendChild(fragment);
 
 	// Here's some bleach for your eyes
 	document.getElementById("count").textContent = Object.values(data).reduce((count, node) => {
