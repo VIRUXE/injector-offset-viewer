@@ -21,10 +21,35 @@ let injectorData = {};
     }
 })();
 
+let toastAnimations = [];
+
 function displayToast(message) {
+	// Cancel any existing animations to prevent race conditions
+	toastAnimations.forEach(animation => animation.cancel());
+	toastAnimations = [];
+	
 	toast.textContent = message;
-	toast.animate({ display: "block", opacity: [0, 1] }, { duration: 1000, fill: "forwards", easing: "ease-in-out" }).onfinish = () =>
-		toast.animate({ display: "none", opacity: [1, 0] }, { duration: 1000, fill: "forwards", easing: "ease-in-out" });
+	
+	// Show animation
+	const showAnimation = toast.animate(
+		{ display: "block", opacity: [0, 1] }, 
+		{ duration: 1000, fill: "forwards", easing: "ease-in-out" }
+	);
+	toastAnimations.push(showAnimation);
+	
+	showAnimation.onfinish = () => {
+		// Hide animation
+		const hideAnimation = toast.animate(
+			{ display: "none", opacity: [1, 0] }, 
+			{ duration: 1000, fill: "forwards", easing: "ease-in-out" }
+		);
+		toastAnimations.push(hideAnimation);
+		
+		hideAnimation.onfinish = () => {
+			// Clean up completed animations
+			toastAnimations = toastAnimations.filter(anim => anim !== hideAnimation);
+		};
+	};
 }
 
 const renderBatteryOffsetTable = (offsets, show = true) => {
