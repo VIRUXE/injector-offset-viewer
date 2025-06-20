@@ -201,12 +201,15 @@ function displayInjectors(data = injectorData) {
 		const card = createInjectorCard(brand, injector, isDuplicate, group);
 		
 		const offsetsContainer = card.getElementsByClassName("offsets-container")[0];
-		const defaultHeight = card.computedStyleMap().get("height").value;
+		let defaultHeight = null;
 		let isExpanded = false;
 
 		const cardClickHandler = (e) => {
 			// Don't toggle if clicking table cells
 			if (e.target.matches('td, th')) return;
+			
+			// Calculate default height on first click if not already calculated
+			if (defaultHeight === null) defaultHeight = card.computedStyleMap().get("height").value;
 			
 			isExpanded = !isExpanded;
 			
